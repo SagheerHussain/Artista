@@ -1,10 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
-  Card,
-  CardContent,
-  Typography,
-  IconButton,
   Table,
   TableBody,
   TableCell,
@@ -13,10 +9,12 @@ import {
   TableRow,
   Paper,
   Button,
+  IconButton,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
+import EditExpenseModal from "./EditExpenseModal";
 
 const expenses = [
   {
@@ -40,9 +38,16 @@ const expenses = [
 ];
 
 const ExpenseTable = ({ setSelectedPage }) => {
+  const [open, setOpen] = useState(false);
+  const [selectedExpense, setSelectedExpense] = useState(null);
+
+  const handleEditExpense = (expense) => {
+    setSelectedExpense(expense);
+    setOpen(true);
+  };
+
   return (
     <Box sx={{ padding: 3, backgroundColor: "#121212", borderRadius: 2 }}>
-      {" "}
       <Box
         sx={{
           display: "flex",
@@ -81,7 +86,10 @@ const ExpenseTable = ({ setSelectedPage }) => {
                 <TableCell sx={{ color: "#fff" }}>{expense.amount}</TableCell>
                 <TableCell sx={{ color: "#fff" }}>{expense.date}</TableCell>
                 <TableCell>
-                  <IconButton color="primary">
+                  <IconButton
+                    color="primary"
+                    onClick={() => handleEditExpense(expense)}
+                  >
                     <EditIcon />
                   </IconButton>
                   <IconButton color="error">
@@ -93,6 +101,15 @@ const ExpenseTable = ({ setSelectedPage }) => {
           </TableBody>
         </Table>
       </TableContainer>
+      <EditExpenseModal
+        open={open}
+        onClose={() => setOpen(false)}
+        initialData={selectedExpense}
+        onSubmit={(updatedExpense) => {
+          console.log("Updated Expense:", updatedExpense);
+          setOpen(false);
+        }}
+      />
     </Box>
   );
 };

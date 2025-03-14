@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Table,
@@ -16,6 +16,7 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
+import EditSalaryModal from "./EditSalaryModal";
 
 const salariesData = [
   {
@@ -48,6 +49,25 @@ const salariesData = [
 ];
 
 const SalariesTable = ({ setSelectedPage }) => {
+  const [selectedSalary, setSelectedSalary] = useState(null);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+
+  const handleEditClick = (salary) => {
+    setSelectedSalary(salary);
+    setEditModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setEditModalOpen(false);
+    setSelectedSalary(null);
+  };
+
+  const handleSalaryUpdate = (updatedSalary) => {
+    console.log("Updated Salary:", updatedSalary);
+    // Shayan Update the state or call an API here
+    setEditModalOpen(false);
+  };
+
   return (
     <Box sx={{ padding: 3, backgroundColor: "#121212", borderRadius: 2 }}>
       <Box
@@ -119,7 +139,11 @@ const SalariesTable = ({ setSelectedPage }) => {
                   />
                 </TableCell>
                 <TableCell>
-                  <IconButton color="primary" size="small">
+                  <IconButton
+                    color="primary"
+                    size="small"
+                    onClick={() => handleEditClick(salary)}
+                  >
                     <EditIcon />
                   </IconButton>
                   <IconButton color="error" size="small">
@@ -131,6 +155,14 @@ const SalariesTable = ({ setSelectedPage }) => {
           </TableBody>
         </Table>
       </TableContainer>
+
+      {/* Edit Salary Modal */}
+      <EditSalaryModal
+        open={editModalOpen}
+        onClose={handleModalClose}
+        initialData={selectedSalary}
+        onSubmit={handleSalaryUpdate}
+      />
     </Box>
   );
 };

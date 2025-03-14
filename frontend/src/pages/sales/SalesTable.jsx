@@ -16,6 +16,9 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
+import EditSalesModal from "./EditSalesModal";
+import { useState } from "react";
+
 const salesData = [
   {
     clientName: "John Doe",
@@ -50,9 +53,16 @@ const salesData = [
 ];
 
 const SalesTable = ({ setSelectedPage }) => {
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedSale, setSelectedSale] = useState(null);
+
+  const handleEditSale = (sale) => {
+    setSelectedSale(sale);
+    setEditModalOpen(true);
+  };
+
   return (
     <Box sx={{ padding: 3, backgroundColor: "#121212", borderRadius: 2 }}>
-      {" "}
       <Box
         sx={{
           display: "flex",
@@ -118,7 +128,11 @@ const SalesTable = ({ setSelectedPage }) => {
                 <TableCell sx={{ color: "#fff" }}>{sale.currency}</TableCell>
                 <TableCell sx={{ color: "#fff" }}>{sale.saleDate}</TableCell>
                 <TableCell>
-                  <IconButton color="primary" size="small">
+                  <IconButton
+                    color="primary"
+                    size="small"
+                    onClick={() => handleEditSale(sale)}
+                  >
                     <EditIcon />
                   </IconButton>
                   <IconButton color="error" size="small">
@@ -130,6 +144,19 @@ const SalesTable = ({ setSelectedPage }) => {
           </TableBody>
         </Table>
       </TableContainer>
+
+      {/* Edit Sales Modal */}
+      {selectedSale && (
+        <EditSalesModal
+          open={editModalOpen}
+          onClose={() => setEditModalOpen(false)}
+          initialData={selectedSale}
+          onSubmit={(updatedSale) => {
+            console.log("Updated Sale:", updatedSale);
+            setEditModalOpen(false);
+          }}
+        />
+      )}
     </Box>
   );
 };

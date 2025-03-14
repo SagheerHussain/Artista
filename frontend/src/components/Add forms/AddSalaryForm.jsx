@@ -8,7 +8,7 @@ import {
   Typography,
 } from "@mui/material";
 
-const AddSalaryForm = () => {
+const AddSalaryForm = ({ setSelectedPage }) => {
   const [formData, setFormData] = useState({
     employeeName: "",
     salary: "",

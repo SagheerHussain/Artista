@@ -198,7 +198,7 @@ const RegisterPage = () => {
 
         <Typography variant="body2" sx={{ mt: 2, color: "#90caf9" }}>
           Already have an account?{" "}
-          <a href="/login" style={{ color: "#64b5f6" }}>
+          <a href="/" style={{ color: "#64b5f6" }}>
             Login
           </a>
         </Typography>
