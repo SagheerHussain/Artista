@@ -149,7 +149,6 @@ const AddSalesForm = ({ setSelectedPage }) => {
             </TextField>
           </Grid>
           <Grid item xs={12} md={6}>
-            {/* Simple Date Input */}
             <TextField
               label="Sale Date"
               name="saleDate"

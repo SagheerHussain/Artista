@@ -16,7 +16,6 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import UpdateIcon from "@mui/icons-material/Update";
 import AddIcon from "@mui/icons-material/Add";
 
 const expenses = [
@@ -84,9 +83,6 @@ const ExpenseTable = ({ setSelectedPage }) => {
                 <TableCell>
                   <IconButton color="primary">
                     <EditIcon />
-                  </IconButton>
-                  <IconButton color="secondary">
-                    <UpdateIcon />
                   </IconButton>
                   <IconButton color="error">
                     <DeleteIcon />

@@ -87,7 +87,6 @@ const RegisterPage = () => {
               },
             }}
           />
-
           <TextField
             fullWidth
             label="Email Address"

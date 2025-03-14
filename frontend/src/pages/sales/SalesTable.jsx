@@ -15,7 +15,6 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import UpdateIcon from "@mui/icons-material/Update";
 import AddIcon from "@mui/icons-material/Add";
 const salesData = [
   {
@@ -121,9 +120,6 @@ const SalesTable = ({ setSelectedPage }) => {
                 <TableCell>
                   <IconButton color="primary" size="small">
                     <EditIcon />
-                  </IconButton>
-                  <IconButton color="success" size="small">
-                    <UpdateIcon />
                   </IconButton>
                   <IconButton color="error" size="small">
                     <DeleteIcon />
