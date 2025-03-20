@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   TextField,
   MenuItem,
@@ -7,32 +7,87 @@ import {
   Box,
   Typography,
 } from "@mui/material";
+import { createSale, getPaymentMethods } from "../../../services/sales";
+import Swal from "sweetalert2";
 
 const AddSalesForm = ({ setSelectedPage }) => {
+  // Get User & Token
+  const user = JSON.parse(localStorage.getItem("user"));
+  const token = JSON.parse(localStorage.getItem("token"));
+
+  // State Variable
   const [formData, setFormData] = useState({
     clientName: "",
+    projectTitle: "",
+    summary: "",
     upfrontAmount: "",
-    receivedAmount: "",
     totalAmount: "",
+    leadDate: null,
+    startDate: null,
+    endDate: null,
+    deadline: null,
     paymentMethod: "",
+    month: "",
+    year: "",
     status: "",
-    currency: "",
-    saleDate: null,
   });
+  const [paymentTypes, setPaymentTypes] = useState([]);
 
+  // Fetch Payment Methods
+  const fetchPaymentMethods = async () => {
+    try {
+      const { paymentMethods } = await getPaymentMethods(token);
+      console.log(paymentMethods);
+      setPaymentTypes(paymentMethods);
+    } catch (error) {
+      console.error("Error fetching payment methods:", error);
+    }
+  };
+
+  // Fetch Payment Methods
+  useEffect(() => {
+    fetchPaymentMethods();
+  }, []);
+
+  // Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
       [name]: value,
-      receivedAmount:
-        name === "upfrontAmount" ? value : formData.receivedAmount,
     });
   };
 
-  const handleSubmit = (e) => {
+  // Handle Submit Form
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Sales Data:", formData);
+    setFormData({
+      ...formData,
+      user: user._id,
+    });
+    try {
+      const { sale, message, success } = await createSale(formData, token);
+      if (success) {
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: message,
+          timer: 1500,
+        });
+        console.log(sale);
+        setTimeout(() => {
+          setSelectedPage("/reports/sales");
+        }, 2000);
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: message,
+        });
+      }
+    } catch (error) {
+      console.error("Error creating sale:", error);
+    }
   };
 
   return (
@@ -56,10 +111,20 @@ const AddSalesForm = ({ setSelectedPage }) => {
           <Grid item xs={12} md={6}>
             <TextField
               fullWidth
-              label="Upfront Amount"
-              name="upfrontAmount"
-              type="number"
-              value={formData.upfrontAmount}
+              label="Project Title"
+              name="projectTitle"
+              value={formData.projectTitle}
+              onChange={handleChange}
+              required
+              sx={{ backgroundColor: "#1e1e1e", borderRadius: 1 }}
+            />
+          </Grid>
+          <Grid item xs={12} md={12}>
+            <TextField
+              fullWidth
+              label="Summary"
+              name="summary"
+              value={formData.summary}
               onChange={handleChange}
               required
               sx={{ backgroundColor: "#1e1e1e", borderRadius: 1 }}
@@ -68,10 +133,12 @@ const AddSalesForm = ({ setSelectedPage }) => {
           <Grid item xs={12} md={6}>
             <TextField
               fullWidth
-              label="Received Amount"
-              name="receivedAmount"
-              value={formData.receivedAmount}
-              disabled
+              label="Upfront Amount"
+              name="upfrontAmount"
+              type="number"
+              value={formData.upfrontAmount}
+              onChange={handleChange}
+              required
               sx={{ backgroundColor: "#1e1e1e", borderRadius: 1 }}
             />
           </Grid>
@@ -98,16 +165,9 @@ const AddSalesForm = ({ setSelectedPage }) => {
               required
               sx={{ backgroundColor: "#1e1e1e", borderRadius: 1 }}
             >
-              {[
-                "Cashapp",
-                "Zelle",
-                "Bank Transfer",
-                "Paypal",
-                "Credit Card",
-                "Other",
-              ].map((option) => (
-                <MenuItem key={option} value={option}>
-                  {option}
+              {paymentTypes?.map((option) => (
+                <MenuItem key={option._id} value={option._id}>
+                  {option.method}
                 </MenuItem>
               ))}
             </TextField>
@@ -123,7 +183,7 @@ const AddSalesForm = ({ setSelectedPage }) => {
               required
               sx={{ backgroundColor: "#1e1e1e", borderRadius: 1 }}
             >
-              {["Pending", "Completed"].map((option) => (
+              {["Pending", "Partially Paid", "Fully Paid"].map((option) => (
                 <MenuItem key={option} value={option}>
                   {option}
                 </MenuItem>
@@ -134,14 +194,27 @@ const AddSalesForm = ({ setSelectedPage }) => {
             <TextField
               select
               fullWidth
-              label="Currency"
-              name="currency"
-              value={formData.currency}
+              label="Month"
+              name="month"
+              value={formData.month}
               onChange={handleChange}
               required
               sx={{ backgroundColor: "#1e1e1e", borderRadius: 1 }}
             >
-              {["USD", "EUR", "GBP", "AED"].map((option) => (
+              {[
+                "January",
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December",
+              ].map((option) => (
                 <MenuItem key={option} value={option}>
                   {option}
                 </MenuItem>
@@ -150,8 +223,56 @@ const AddSalesForm = ({ setSelectedPage }) => {
           </Grid>
           <Grid item xs={12} md={6}>
             <TextField
-              label="Sale Date"
-              name="saleDate"
+              fullWidth
+              label="Year"
+              name="year"
+              type="number"
+              value={formData.year}
+              onChange={handleChange}
+              required
+              sx={{ backgroundColor: "#1e1e1e", borderRadius: 1 }}
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <TextField
+              label="Start Date"
+              name="startDate"
+              type="date"
+              fullWidth
+              onChange={handleChange}
+              InputLabelProps={{ shrink: true }}
+              required
+              sx={{ backgroundColor: "#1e1e1e", borderRadius: 1 }}
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <TextField
+              label="End Date"
+              name="endDate"
+              type="date"
+              fullWidth
+              onChange={handleChange}
+              InputLabelProps={{ shrink: true }}
+              required
+              sx={{ backgroundColor: "#1e1e1e", borderRadius: 1 }}
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <TextField
+              label="Deadline"
+              name="deadline"
+              type="date"
+              fullWidth
+              onChange={handleChange}
+              InputLabelProps={{ shrink: true }}
+              required
+              sx={{ backgroundColor: "#1e1e1e", borderRadius: 1 }}
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <TextField
+              label="Lead Date"
+              name="leadDate"
               type="date"
               fullWidth
               onChange={handleChange}

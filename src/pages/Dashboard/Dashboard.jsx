@@ -1,4 +1,5 @@
 import * as React from "react";
+import logoSrc from "/Images/logo.png"
 import { useEffect, useState } from "react";
 import { ThemeProvider, createTheme, styled } from "@mui/material/styles";
 import {
@@ -29,14 +30,19 @@ import SalesTable from "../../pages/sales/SalesTable";
 import ExpenseTable from "../../pages/expenses/ExpenseTable";
 import SalariesTable from "../../pages/salaries/SalariesTable";
 import AddSalaryForm from "../../components/Add forms/AddSalaryForm";
-import { getRevenue, getTotalExpance, getTotalRecievedAmount, getPendingAmount, getClients } from "../../../services/analyticsService";
+import {
+  getRevenue,
+  getTotalExpance,
+  getTotalRecievedAmount,
+  getPendingAmount,
+  getClients,
+} from "../../../services/analyticsService";
 
 const NAVIGATION = [
-
   { kind: "header", title: "Main" },
   { segment: "dashboard", title: "Dashboard", icon: <DashboardIcon /> },
 
-  { segment: "users", title: "Users", icon: <PeopleAltIcon /> },
+  // { segment: "users", title: "Users", icon: <PeopleAltIcon /> },
 
   { kind: "divider" },
   { kind: "header", title: "Analytics" },
@@ -46,8 +52,8 @@ const NAVIGATION = [
     icon: <BarChartIcon />,
     children: [
       { segment: "sales", title: "Sales", icon: <DescriptionIcon /> },
-      { segment: "expenses", title: "Expenses", icon: <MonetizationOnIcon /> },
-      { segment: "salaries", title: "Salaries", icon: <PaymentsIcon /> },
+      // { segment: "expenses", title: "Expenses", icon: <MonetizationOnIcon /> },
+      // { segment: "salaries", title: "Salaries", icon: <PaymentsIcon /> },
     ],
   },
   // { segment: "integrations", title: "Integrations", icon: <LayersIcon /> },
@@ -93,7 +99,6 @@ const DashboardCard = styled(Card)(({ theme }) => ({
 }));
 
 export default function Dashboard() {
-
   // Get Token From Storage
   const token = JSON.parse(localStorage.getItem("token"));
 
@@ -170,22 +175,21 @@ export default function Dashboard() {
       setPendingAmount(pendingAmount.totalAmount);
       setClients(clients.totalClients);
       // setTotalExpance(expance.totalAmount);
-      console.log("analytics", revenue, recievedAmount, pendingAmount, clients)
+      console.log("analytics", revenue, recievedAmount, pendingAmount, clients);
     } catch (error) {
       console.error("Error fetching analytics:", error);
     }
-  }
+  };
 
   useEffect(() => {
     fetchAnalytics();
-  }, [])
+  }, []);
 
   return (
     <ThemeProvider theme={darkTheme}>
       <AppProvider
         branding={{
-          logo: <img src="https://mui.com/static/logo.png" alt="MUI logo" />,
-          title: "Artista Digitals",
+          logo: <img src={logoSrc} alt="Artista Digitals" />,
           homeUrl: "/",
         }}
         navigation={NAVIGATION}
@@ -219,6 +223,7 @@ export default function Dashboard() {
                 <AddSalaryForm setSelectedPage={setSelectedPage} />
               ) : (
                 <>
+                  {/* Dashboard Live Currency Exhange Rates Cards */}
                   <Grid
                     item
                     xs={12}
@@ -496,6 +501,7 @@ export default function Dashboard() {
                     </DashboardCard>
                   </Grid>
 
+                  {/* Total Amount Generated */}
                   <Grid container spacing={3}>
                     <Grid item xs={12} sm={6} md={3}>
                       <DashboardCard>
@@ -542,7 +548,9 @@ export default function Dashboard() {
                           <Typography variant="h6" sx={{ fontSize: "18px" }}>
                             Received Amount
                           </Typography>
-                          <Typography variant="h5">${totalRecievedAmount}</Typography>
+                          <Typography variant="h5">
+                            ${totalRecievedAmount}
+                          </Typography>
                         </CardContent>
                       </DashboardCard>
                     </Grid>

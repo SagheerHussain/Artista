@@ -70,4 +70,3 @@ export const getRecievedAmountByEmployee = async (id, token) => {
   return response.data;
 };
 
-\
