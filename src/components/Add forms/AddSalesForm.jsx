@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import { createSale, getPaymentMethods } from "../../../services/sales";
 import Swal from "sweetalert2";
+import { ClipLoader } from "react-spinners";
 
 const AddSalesForm = ({ setSelectedPage }) => {
   // Get User & Token
@@ -32,6 +33,7 @@ const AddSalesForm = ({ setSelectedPage }) => {
     status: "",
   });
   const [paymentTypes, setPaymentTypes] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   // Fetch Payment Methods
   const fetchPaymentMethods = async () => {
@@ -61,9 +63,10 @@ const AddSalesForm = ({ setSelectedPage }) => {
   // Handle Submit Form
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     setFormData({
       ...formData,
-      user: user._id,
+      user: user._id
     });
     try {
       const { sale, message, success } = await createSale(formData, token);
@@ -74,7 +77,7 @@ const AddSalesForm = ({ setSelectedPage }) => {
           text: message,
           timer: 1500,
         });
-        console.log(sale);
+        setLoading(false);
         setTimeout(() => {
           setSelectedPage("/reports/sales");
         }, 2000);
@@ -84,8 +87,10 @@ const AddSalesForm = ({ setSelectedPage }) => {
           title: "Error",
           text: message,
         });
+        setLoading(false);
       }
     } catch (error) {
+      setLoading(false);
       console.error("Error creating sale:", error);
     }
   };
@@ -233,54 +238,6 @@ const AddSalesForm = ({ setSelectedPage }) => {
               sx={{ backgroundColor: "#1e1e1e", borderRadius: 1 }}
             />
           </Grid>
-          <Grid item xs={12} md={6}>
-            <TextField
-              label="Start Date"
-              name="startDate"
-              type="date"
-              fullWidth
-              onChange={handleChange}
-              InputLabelProps={{ shrink: true }}
-              required
-              sx={{ backgroundColor: "#1e1e1e", borderRadius: 1 }}
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <TextField
-              label="End Date"
-              name="endDate"
-              type="date"
-              fullWidth
-              onChange={handleChange}
-              InputLabelProps={{ shrink: true }}
-              required
-              sx={{ backgroundColor: "#1e1e1e", borderRadius: 1 }}
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <TextField
-              label="Deadline"
-              name="deadline"
-              type="date"
-              fullWidth
-              onChange={handleChange}
-              InputLabelProps={{ shrink: true }}
-              required
-              sx={{ backgroundColor: "#1e1e1e", borderRadius: 1 }}
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <TextField
-              label="Lead Date"
-              name="leadDate"
-              type="date"
-              fullWidth
-              onChange={handleChange}
-              InputLabelProps={{ shrink: true }}
-              required
-              sx={{ backgroundColor: "#1e1e1e", borderRadius: 1 }}
-            />
-          </Grid>
         </Grid>
         <Box
           mt={2}
@@ -293,8 +250,8 @@ const AddSalesForm = ({ setSelectedPage }) => {
           >
             Cancel
           </Button>
-          <Button variant="contained" color="primary" type="submit">
-            Submit
+          <Button variant="contained" color="primary" type="submit" disabled={loading}>
+            {loading ? <ClipLoader size={28} color="#fff" /> : "Create"}
           </Button>
         </Box>
       </form>

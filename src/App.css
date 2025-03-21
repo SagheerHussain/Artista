@@ -1,0 +1,6 @@
+div[aria-label="Light mode"] {
+    display: none !important;
+}
+header .MuiTypography-root.MuiTypography-h6 {
+    display: none !important;
+}

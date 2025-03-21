@@ -53,7 +53,7 @@ const NAVIGATION = [
     children: [
       { segment: "sales", title: "Sales", icon: <DescriptionIcon /> },
       // { segment: "expenses", title: "Expenses", icon: <MonetizationOnIcon /> },
-      // { segment: "salaries", title: "Salaries", icon: <PaymentsIcon /> },
+      { segment: "salaries", title: "Salaries", icon: <PaymentsIcon /> },
     ],
   },
   // { segment: "integrations", title: "Integrations", icon: <LayersIcon /> },
@@ -203,7 +203,7 @@ export default function Dashboard() {
       >
         {" "}
         <DashboardLayout>
-          <PageContainer>
+          <PageContainer sx={{ maxWidth: "1600px !important" }}>
             <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
               {selectedPage === "/users" ? (
                 <UsersTable setSelectedPage={setSelectedPage} />

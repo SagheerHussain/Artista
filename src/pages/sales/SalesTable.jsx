@@ -1,15 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
   Box,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Typography,
-  Chip,
   IconButton,
   Button,
   Menu,
@@ -26,7 +17,13 @@ import EditSalesModal from "./EditSalesModal";
 import GridTable from "../../components/GridTable";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { ButtonComponent } from "../../components/index";
-import { getSales } from "../../../services/sales";
+import {
+  deleteSale,
+  getFilteredRecordByEmployee,
+  getSales,
+  getSalesByEmployee,
+} from "../../../services/sales";
+import Swal from "sweetalert2";
 
 const salesData = [
   {
@@ -88,6 +85,7 @@ const SalesTable = ({ setSelectedPage }) => {
   const token = JSON.parse(localStorage.getItem("token"));
 
   // State Variables
+  const [saleId, setSaleId] = useState("");
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedSale, setSelectedSale] = useState(null);
   const [rows, setRows] = useState([]);
@@ -97,13 +95,14 @@ const SalesTable = ({ setSelectedPage }) => {
   const [month, setMonth] = useState("");
   const [year, setYear] = useState("");
   const [employee, setEmployee] = useState("");
+  const [status, setStatus] = useState("");
+  const [search, setSearch] = useState("");
   const [sales, setSales] = useState([]);
 
   // Fetching Sales Data
   const fetchingSales = async () => {
     try {
-      const { success, sales, message } = await getSales(token);
-      console.log("inside == >", sales)
+      const { sales } = await getSalesByEmployee(token, user._id);
       setSales(sales);
     } catch (error) {
       console.log(error);
@@ -112,15 +111,14 @@ const SalesTable = ({ setSelectedPage }) => {
 
   useEffect(() => {
     fetchingSales();
-  }, [])
-  
-  // Fetch Sales Data
+  }, []);
+
+  // Map Sales Columns
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // const data = await getBooks();
-        const formattedRows = sales.map((item, index) => ({
-          id: item._id || index + 1,
+        const formattedRows = sales.map((item) => ({
+          id: item._id,
           clientName: item.clientName,
           projectTitle: item.projectTitle,
           summary: item.summary,
@@ -143,7 +141,7 @@ const SalesTable = ({ setSelectedPage }) => {
     };
 
     fetchData();
-  }, [fetchingSales]);
+  }, [sales]);
 
   // Handle Month Change
   const handleMonthChange = (event) => {
@@ -155,11 +153,15 @@ const SalesTable = ({ setSelectedPage }) => {
     setYear(event.target.value);
   };
 
+  // Handle Status Change
+  const handleStatusChange = (event) => {
+    setStatus(event.target.value);
+  };
+
   // Handle Employee Change
   const handleEmployeeChange = (event) => {
     setEmployee(event.target.value);
   };
-
 
   // Define Table Rows And Columns
   const columns = [
@@ -219,6 +221,13 @@ const SalesTable = ({ setSelectedPage }) => {
       flex: 1,
       minWidth: 150,
       editable: true,
+      renderCell: (params) => (
+        <span
+          className={`px-4 py-2 font-semibold rounded-[25px] text-[#95a224] bg-[#2a250d]`}
+        >
+          {params.row.paymentMethod}
+        </span>
+      ),
     },
     {
       field: "status",
@@ -226,6 +235,13 @@ const SalesTable = ({ setSelectedPage }) => {
       flex: 1,
       minWidth: 150,
       editable: true,
+      renderCell: (params) => (
+        <span
+          className={`px-4 py-2 font-semibold rounded-[25px] ${params.row.status === "Fully Paid" ? "text-[#24a24f] bg-[#0d2a1f]" : params.row.status === "Partially Paid" ? "text-[#79a7bc] bg-[#152432]" : "text-[#f43333] bg-[#3e1716]"}`}
+        >
+          {params.row.status}
+        </span>
+      ),
     },
     {
       field: "month",
@@ -301,14 +317,64 @@ const SalesTable = ({ setSelectedPage }) => {
 
   // Edit Sale Modal
   const handleEditSale = (sale) => {
-    // setSelectedSale(sale);
-    // setEditModalOpen(true);
+    setSaleId(selectedId);
+    setSelectedSale(sale);
+    setEditModalOpen(true);
+    handleMenuClose();
   };
 
-  const handleDelete = (id) => {
-    // setSelectedId(id);
-    // setDeleteModalOpen(true);
+  const handleDelete = async () => {
+    handleMenuClose();
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "Do you really want to delete this sale? This action cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const { success, message } = await deleteSale(selectedId, token);
+        if (success) {
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: message,
+            timer: 1500,
+          });
+          setRows(rows.filter((row) => row.id !== selectedId));
+        }
+      } catch (error) {
+        console.error("Error deleting sale:", error);
+      }
+    }
   };
+
+  // Filter Records By Employee ID
+  const getFilteredByEmployee = async () => {
+    try {
+      const { success, sales, message } = await getFilteredRecordByEmployee(
+        user._id,
+        token,
+        month,
+        year,
+        search,
+        status
+      );
+      if (success) {
+        setSales(sales);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getFilteredByEmployee();
+  }, [month, year, status, search]);
 
   return (
     <Box sx={{ padding: 3, backgroundColor: "#121212", borderRadius: 2 }}>
@@ -330,8 +396,8 @@ const SalesTable = ({ setSelectedPage }) => {
       </Box>
 
       <div className="search_records flex justify-between gap-4 mb-4">
-        {/* <FormControl className="w-1/2">
-          <InputLabel id="demo-simple-select-label">Employees</InputLabel>
+        <FormControl className="w-1/2">
+          <InputLabel id="demo-simple-select-label">Employee</InputLabel>
           <Select
             labelId="demo-simple-select-label"
             id="demo-simple-select"
@@ -339,22 +405,37 @@ const SalesTable = ({ setSelectedPage }) => {
             label="Employee"
             onChange={handleEmployeeChange}
           >
-            {[
-              "Muhammad Shayan",
-              "Hassan Raza",
-              "Muhammad Rafay"
-            ].map((employee) => (
-              <MenuItem key={employee} value={employee}>
-                {employee}
+            {["Muhammad Shayan", "Hassan Raza", "Sagheer Hussain"].map(
+              (employee) => (
+                <MenuItem key={employee} value={employee}>
+                  {employee}
+                </MenuItem>
+              )
+            )}
+          </Select>
+        </FormControl>
+        <FormControl className="w-1/2">
+          <InputLabel id="demo-simple-select-label">Status</InputLabel>
+          <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            value={status}
+            label="Status"
+            onChange={handleStatusChange}
+          >
+            {["Pending", "Fully Paid", "Partially Paid"].map((status) => (
+              <MenuItem key={status} value={status}>
+                {status}
               </MenuItem>
             ))}
           </Select>
-        </FormControl> */}
+        </FormControl>
         <TextField
           id="outlined-basic"
           label="Search Records"
           variant="outlined"
-          className="w-[30%]"
+          className="w-1/2"
+          onChange={(e) => setSearch(e.target.value)}
         />
       </div>
       <div className="filter_records flex gap-4">
@@ -405,7 +486,6 @@ const SalesTable = ({ setSelectedPage }) => {
             ))}
           </Select>
         </FormControl>
-        <ButtonComponent label="Filter" onButtonClick={() => {}} />
       </div>
 
       <GridTable
@@ -420,6 +500,8 @@ const SalesTable = ({ setSelectedPage }) => {
       {selectedSale && (
         <EditSalesModal
           open={editModalOpen}
+          saleId={saleId}
+          refetchSales={fetchingSales}
           onClose={() => setEditModalOpen(false)}
           initialData={selectedSale}
           onSubmit={(updatedSale) => {

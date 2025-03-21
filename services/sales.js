@@ -19,11 +19,12 @@ export const getSaleById = async (id, token) => {
       headers: { Authorization: `Bearer ${token}` },
     }
   );
+  console.log(response.data);
   return response.data;
 };
 
 // Get Sales By Employee
-export const getSalesByEmployee = async (id, token) => {
+export const getSalesByEmployee = async (token, id) => {
   const response = await axios.get(
     `${import.meta.env.VITE_BASE_URL}/api/sales/employee/${id}`,
     {
@@ -44,14 +45,15 @@ export const getEmployeeCurrentSalesAmount = async (id, token) => {
   return response.data;
 };
 
-// Get Employee Past Sales
-export const getEmployeePastSales = async (id, token, month, year) => {
+// Get Employee Filtered Sales
+export const getFilteredRecordByEmployee = async (id, token, month, year, search, status) => {
   const response = await axios.get(
-    `${import.meta.env.VITE_BASE_URL}/api/sales/employee/past-sales/${id}/${month}/${year}`,
+    `${import.meta.env.VITE_BASE_URL}/api/sales/employee/filter-sales/${id}?month=${month}&year=${year}&search=${search}&status=${status}`,
     {
       headers: { Authorization: `Bearer ${token}` },
     }
   );
+  console.log(response.data);
   return response.data;
 };
 
