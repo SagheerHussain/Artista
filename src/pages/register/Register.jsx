@@ -48,6 +48,21 @@ const RegisterPage = () => {
     setLoading(true);
     try {
       const response = await registerAccount(formData);
+
+      if (
+        formData.name === "" ||
+        formData.email === "" ||
+        formData.password === ""
+      ) {
+        Swal.fire({
+          icon: "error",
+          text: "All Fields are required",
+          timer: 1500,
+        });
+        setLoading(false);
+        return;
+      }
+
       if (response.success) {
         setLoading(false);
         Swal.fire({
@@ -60,7 +75,11 @@ const RegisterPage = () => {
         }, 2500);
       }
     } catch (error) {
-      console.error("Error registering user:", error);
+      Swal.fire({
+        icon: "error",
+        text: "Failed to Register Account",
+        timer: 1500,
+      });
       setLoading(false);
     }
   };
@@ -180,7 +199,6 @@ const RegisterPage = () => {
             margin="normal"
             name="profilePicture"
             onChange={handleFileChange}
-            required
             InputProps={{
               sx: { color: "white" },
             }}

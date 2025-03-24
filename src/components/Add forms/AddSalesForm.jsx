@@ -23,13 +23,7 @@ const AddSalesForm = ({ setSelectedPage }) => {
     summary: "",
     upfrontAmount: "",
     totalAmount: "",
-    leadDate: null,
-    startDate: null,
-    endDate: null,
-    deadline: null,
     paymentMethod: "",
-    month: "",
-    year: "",
     status: "",
   });
   const [paymentTypes, setPaymentTypes] = useState([]);
@@ -69,7 +63,7 @@ const AddSalesForm = ({ setSelectedPage }) => {
       user: user._id
     });
     try {
-      const { sale, message, success } = await createSale(formData, token);
+      const { message, success } = await createSale(formData, token);
       if (success) {
         Swal.fire({
           icon: "success",
@@ -194,49 +188,6 @@ const AddSalesForm = ({ setSelectedPage }) => {
                 </MenuItem>
               ))}
             </TextField>
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <TextField
-              select
-              fullWidth
-              label="Month"
-              name="month"
-              value={formData.month}
-              onChange={handleChange}
-              required
-              sx={{ backgroundColor: "#1e1e1e", borderRadius: 1 }}
-            >
-              {[
-                "January",
-                "February",
-                "March",
-                "April",
-                "May",
-                "June",
-                "July",
-                "August",
-                "September",
-                "October",
-                "November",
-                "December",
-              ].map((option) => (
-                <MenuItem key={option} value={option}>
-                  {option}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <TextField
-              fullWidth
-              label="Year"
-              name="year"
-              type="number"
-              value={formData.year}
-              onChange={handleChange}
-              required
-              sx={{ backgroundColor: "#1e1e1e", borderRadius: 1 }}
-            />
           </Grid>
         </Grid>
         <Box

@@ -15,62 +15,75 @@ import EditSalaryModal from "./EditSalaryModal";
 import GridTable from "../../components/GridTable";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { IoMdCheckmark } from "react-icons/io";
-
-const salariesData = [
-  {
-    employee: "John Doe",
-    amount: "30000",
-    status: "Paid",
-    paidDate: "2025-03-10",
-    bonus: "270",
-    totalAmount: "8600",
-  },
-  {
-    employee: "Jane Smith",
-    amount: "4500",
-    status: "Pending",
-    paidDate: "2025-03-12",
-    bonus: "270",
-    totalAmount: "4600",
-  },
-  {
-    employee: "Ali Khan",
-    amount: "2800",
-    status: "Paid",
-    paidDate: "2025-03-15",
-    bonus: "270",
-    totalAmount: "2900",
-  },
-];
+import { filterSalaries, getSalaries } from "../../../services/salary";
+import { getEmployees } from "../../../services/users";
+import { FaPencilAlt } from "react-icons/fa";
 
 const SalariesTable = ({ setSelectedPage }) => {
+  const token = JSON.parse(localStorage.getItem("token"));
+
+  // State Variables
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedSalary, setSelectedSalary] = useState(null);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [selectedId, setSelectedId] = useState(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [rows, setRows] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
+  const [salaries, setSalaries] = useState([]);
+  const [employees, setEmployees] = useState([]);
+  const [month, setMonth] = useState("");
+  const [employee, setEmployee] = useState("");
+  const [year, setYear] = useState("");
+  const [status, setStatus] = useState("");
 
-  // Handle Actions Menu
-  const handleMenuOpen = (event, id) => {
-    setAnchorEl(event.currentTarget);
-    setSelectedId(id);
+  // Fetch Employees Data
+  const fetchEmployees = async () => {
+    try {
+      const employees = await getEmployees(token);
+      const filteredEmployees = employees.users.filter(
+        (user) => user.role === "employee"
+      );
+      setEmployees(filteredEmployees);
+    } catch (error) {
+      console.error("Error fetching employees:", error);
+    }
   };
 
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    setSelectedId(null);
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
+
+  // Fetch Salaries Data
+  const fetchSalaries = async () => {
+    try {
+      const { success, salaries, message } = await getSalaries(token);
+      if (success) {
+        setSalaries(salaries);
+      }
+    } catch (error) {
+      console.error("Error fetching salaries:", error);
+    }
   };
 
+  useEffect(() => {
+    fetchSalaries();
+  }, []);
+  
   // Map Sales Columns
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const formattedRows = salariesData.map((item, index) => ({
-          id: index + 1,
-          employee: item.employee,
+        const formattedRows = salaries.map((item, index) => ({
+          id: item._id,
+          employeeId: item.employee._id,
+          No: index + 1,
+          employee: item.employee.name,
           amount: item.amount,
           status: item.status,
           paidDate: item.paidDate,
+          month: item.month,
+          year: item.year,
           bonus: item.bonus,
           totalAmount: item.totalAmount,
         }));
@@ -81,11 +94,12 @@ const SalariesTable = ({ setSelectedPage }) => {
     };
 
     fetchData();
-  }, []);
+  }, [salaries]);
+
 
   // Define Table Rows And Columns
   const columns = [
-    { field: "id", headerName: "ID", flex: 1, minWidth: 150 },
+    { field: "No", headerName: "Index", flex: 1, minWidth: 150 },
     {
       field: "employee",
       headerName: "Employee",
@@ -99,6 +113,9 @@ const SalariesTable = ({ setSelectedPage }) => {
       flex: 1,
       minWidth: 150,
       editable: true,
+      renderCell: (params) => (
+        <span className="text-white">Rs.{params.row.amount}</span>
+      ),
     },
     {
       field: "status",
@@ -120,6 +137,9 @@ const SalariesTable = ({ setSelectedPage }) => {
       flex: 1,
       minWidth: 150,
       editable: true,
+      renderCell: (params) => (
+        <span className="text-white">{params.row.paidDate.split("T")[0]}</span>
+      ),
     },
     {
       field: "bonus",
@@ -127,6 +147,9 @@ const SalariesTable = ({ setSelectedPage }) => {
       flex: 1,
       minWidth: 150,
       editable: true,
+      renderCell: (params) => (
+        <span className="text-white">Rs.{params.row.bonus}</span>
+      ),
     },
     {
       field: "totalAmount",
@@ -134,36 +157,44 @@ const SalariesTable = ({ setSelectedPage }) => {
       flex: 1,
       minWidth: 150,
       editable: true,
+      renderCell: (params) => (
+        <span className="text-white">Rs.{params.row.totalAmount}</span>
+      ),
     },
     {
-      field: "actions",
-      headerName: "Actions",
+      field: "month",
+      headerName: "Month",
+      flex: 1,
+      minWidth: 150,
+      editable: true,
+    },
+    {
+      field: "year",
+      headerName: "Year",
+      flex: 1,
+      minWidth: 150,
+      editable: true,
+    },
+    {
+      field: "edit",
+      headerName: "Edit",
       flex: 1,
       minWidth: 150,
       sortable: false,
       renderCell: (params) => (
         <>
-          <IconButton onClick={(event) => handleMenuOpen(event, params.row.id)}>
-            <BsThreeDotsVertical className="text-white" />
+          <IconButton onClick={() => handleEditSalary(params.row.id, params.row.employeeId)}>
+            <FaPencilAlt size={20} className="text-white" />
           </IconButton>
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl) && selectedId === params.row.id}
-            onClose={handleMenuClose}
-          >
-            <MenuItem onClick={handleEditSalary}>Edit</MenuItem>
-            <MenuItem onClick={handleDelete} className="text-red-500">
-              Delete
-            </MenuItem>
-          </Menu>
         </>
       ),
     },
   ];
 
   // Edit Salary
-  const handleEditSalary = (salary) => {
+  const handleEditSalary = (salary, employeeId) => {
     setSelectedSalary(salary);
+    setSelectedEmployee(employeeId);
     setEditModalOpen(true);
   };
 
@@ -175,6 +206,21 @@ const SalariesTable = ({ setSelectedPage }) => {
     setEditModalOpen(false);
     setSelectedSalary(null);
   };
+
+
+  // Filter Records
+  const handleFilter = async () => {
+    try {
+      const { salaries } = await filterSalaries(token, month, year, status, employee);
+      setSalaries(salaries)
+    } catch (error) {
+      console.error("Error fetching filtered salaries:", error);
+    }
+  };
+
+  useEffect(() => {
+    handleFilter();
+  }, [month, year, status, employee]);
 
   return (
     <Box sx={{ padding: 3, backgroundColor: "#121212", borderRadius: 2 }}>
@@ -195,20 +241,20 @@ const SalariesTable = ({ setSelectedPage }) => {
         </Button>
       </Box>
 
-      <div className="search_records grid grid-cols-3 gap-4">
+      <div className="search_records grid grid-cols-4 gap-4">
         <FormControl className="w-full">
           <InputLabel id="demo-simple-select-label">Employee</InputLabel>
           <Select
             labelId="demo-simple-select-label"
             id="demo-simple-select"
-            // value={employee}
+            value={employee}
             label="Employee"
-            // onChange={handleEmployeeChange}
+            onChange={(e) => setEmployee(e.target.value)}
           >
-            {["Muhammad Shayan", "Hassan Raza", "Sagheer Hussain"].map(
+            {employees?.map(
               (employee) => (
-                <MenuItem key={employee} value={employee}>
-                  {employee}
+                <MenuItem key={employee._id} value={employee._id}>
+                  {employee.name}
                 </MenuItem>
               )
             )}
@@ -219,9 +265,8 @@ const SalariesTable = ({ setSelectedPage }) => {
           <Select
             labelId="demo-simple-select-label"
             id="demo-simple-select"
-            // value={month}
             label="Month"
-            // onChange={handleMonthChange}
+            onChange={(e) => setMonth(e.target.value)}
           >
             {[
               "January",
@@ -248,15 +293,31 @@ const SalariesTable = ({ setSelectedPage }) => {
           <Select
             labelId="demo-simple-select-label"
             id="demo-simple-select"
-            // value={year}
-            label="Month"
-            // onChange={handleYearChange}
+            label="Year"
+            onChange={(e) => setYear(e.target.value)}
           >
             {[
               2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015,
             ].map((year) => (
               <MenuItem key={year} value={year}>
                 {year}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <FormControl fullWidth>
+          <InputLabel id="demo-simple-select-label">Status</InputLabel>
+          <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            label="Status"
+            onChange={(e) => setStatus(e.target.value)}
+          >
+            {[
+              "Paid", "Pending"
+            ].map((status) => (
+              <MenuItem key={status} value={status}>
+                {status}
               </MenuItem>
             ))}
           </Select>
@@ -274,7 +335,9 @@ const SalariesTable = ({ setSelectedPage }) => {
       <EditSalaryModal
         open={editModalOpen}
         onClose={handleModalClose}
-        initialData={selectedSalary}
+        selectedSalary={selectedSalary}
+        refetchSalaries={fetchSalaries}
+        selectedEmployee={selectedEmployee}
       />
     </Box>
   );

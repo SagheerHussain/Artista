@@ -50,15 +50,6 @@ export const getClients = async (token) => {
   return response.data;
 };
 
-export const getRevenueByEmployee = async (id, token) => {
-  const response = await axios.get(
-    `${import.meta.env.VITE_BASE_URL}/api/sales/employee/revenue/${id}`,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
-  return response.data;
-};
 
 export const getRecievedAmountByEmployee = async (id, token) => {
   const response = await axios.get(
@@ -67,6 +58,56 @@ export const getRecievedAmountByEmployee = async (id, token) => {
       headers: { Authorization: `Bearer ${token}` },
     }
   );
+  console.log("Employee Recieved Amount", response.data);
   return response.data;
 };
 
+export const getPendingAmountByEmployee = async (id, token) => {
+  const response = await axios.get(
+    `${import.meta.env.VITE_BASE_URL}/api/sales/employee/pending-amount/${id}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  console.log("Employee Pending Amount", response.data);
+  return response.data;
+};
+
+export const getClientsByEmployee = async (id, token) => {
+  const response = await axios.get(
+    `${import.meta.env.VITE_BASE_URL}/api/sales/employee/unique-clients/${id}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  console.log("Employee Clients", response.data);
+  return response.data;
+};
+
+export const getMonthlySalesData = async () => {
+  const response = await axios.get(
+    `${import.meta.env.VITE_BASE_URL}/api/sales/monthly-sales-data`,
+  );
+  return response.data;
+};
+
+export const getYearlySalesData = async () => {
+  const response = await axios.get(
+    `${import.meta.env.VITE_BASE_URL}/api/sales/yearly-sales-data`,
+  );
+  return response.data;
+};
+
+export const getMonthlySalaryData = async () => {
+  const response = await axios.get(
+    `${import.meta.env.VITE_BASE_URL}/api/salaries/monthly-salaries`,
+  );
+  return response.data;
+};
+
+export const getYearlySalaryData = async () => {
+  const response = await axios.get(
+    `${import.meta.env.VITE_BASE_URL}/api/salaries/yearly-salaries`,
+  );
+  return response.data;
+};

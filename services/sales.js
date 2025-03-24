@@ -36,24 +36,52 @@ export const getSalesByEmployee = async (token, id) => {
 
 // Get Employee Current Sales Amount
 export const getEmployeeCurrentSalesAmount = async (id, token) => {
+  console.log(id, token)
   const response = await axios.get(
-    `${import.meta.env.VITE_BASE_URL}/api/sales/employee/current-sales-amount/${id}`,
+    `${import.meta.env.VITE_BASE_URL}/api/sales/employee/current/sales-amount/${id}`,
     {
       headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  console.log(response.data)
+  return response.data;
+};
+
+// Get Overall Filtered Sales
+export const getFilteredRecord = async (token, month, year, search, status, employeeId) => {
+  console.log(month, year, search, status, employeeId);
+  const response = await axios.get(
+    `${import.meta.env.VITE_BASE_URL}/api/sales/filtered-records/sales`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+      params: {
+        month,
+        year,
+        search,
+        status,
+        user: employeeId,
+      },
     }
   );
   return response.data;
 };
 
 // Get Employee Filtered Sales
-export const getFilteredRecordByEmployee = async (id, token, month, year, search, status) => {
+export const getEmployeeFilteredRecord = async (token, month, year, search, status, employeeId) => {
+  console.log(month, year, search, status, employeeId);
   const response = await axios.get(
-    `${import.meta.env.VITE_BASE_URL}/api/sales/employee/filter-sales/${id}?month=${month}&year=${year}&search=${search}&status=${status}`,
+    `${import.meta.env.VITE_BASE_URL}/api/sales/employee/filtered-records/sales/${employeeId}`,
     {
       headers: { Authorization: `Bearer ${token}` },
+      params: {
+        month,
+        year,
+        search,
+        status,
+        user: employeeId,
+      },
     }
   );
-  console.log(response.data);
   return response.data;
 };
 

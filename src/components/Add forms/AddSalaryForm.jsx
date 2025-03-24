@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   TextField,
   MenuItem,
@@ -9,44 +9,122 @@ import {
   Box,
   InputLabel,
 } from "@mui/material";
+import { getEmployees } from "../../../services/users";
+import { createSalary } from "../../../services/salary";
+import Swal from "sweetalert2";
+import { getEmployeeCurrentSalesAmount } from "../../../services/sales";
+import UseExchangeRates from "../../hooks/UseExchangeRates";
 
 const AddSalaryForm = ({ setSelectedPage }) => {
+  const token = JSON.parse(localStorage.getItem("token"));
+  const user = JSON.parse(localStorage.getItem("user"));
+
   const [formData, setFormData] = useState({
     employee: "",
-    amount: 0,
+    amount: 0, // Commission %
     bonus: 0,
+    month: "",
+    year: 2025,
     status: "",
     paidDate: "",
   });
 
-  const DOLLAR_RATE = 287; // Fixed dollar rate
+  // Exchange Rates
+  const rates = UseExchangeRates();
 
+  const [employees, setEmployees] = useState([]);
+  const [totalMonthlySales, setTotalMonthlySales] = useState(0);
+  const [textDeduction, setTextDeduction] = useState(0);
+
+  // Fetch Employees
+  const fetchEmployees = async () => {
+    try {
+      const employees = await getEmployees(token);
+      const filteredEmployees = employees.users.filter(
+        (user) => user.role === "employee"
+      );
+      setEmployees(filteredEmployees);
+    } catch (error) {
+      console.error("Error fetching employees:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
+
+  // Handle Input Change
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
+  // Handle Employee Change
   const handleChangeEmployee = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
+    getCurrentSalesAmount(value);
   };
 
-  // Calculate Total Salary
+  // Calculate Commission & Total Salary
   const calculateTotalSalary = () => {
     const commissionPercent = Number(formData.amount) || 0;
     const bonus = Number(formData.bonus) || 0;
+    const deductionPercent = Number(textDeduction) || 0;
 
-    const commissionInDollar = (1000 * commissionPercent) / 100;
-    const commissionInPKR = commissionInDollar * 280;
-    const totalSalary = commissionInPKR + bonus;
+    const commissionInDollar = (totalMonthlySales * commissionPercent) / 100;
+    const commissionInPKR = commissionInDollar * (rates.PKR || 280);
 
-    return totalSalary.toFixed(0); // No decimal points
+    const deductionAmount = (commissionInPKR * deductionPercent) / 100;
+    const finalCommission = commissionInPKR - deductionAmount;
+    const totalSalary = finalCommission + bonus;
+
+    return {
+      commission: finalCommission.toFixed(0),
+      totalSalary: totalSalary.toFixed(0),
+    };
   };
 
-  const handleSubmit = (e) => {
+  // Handle Form Submit
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const totalSalary = calculateTotalSalary();
-    console.log("Salary Data:", { ...formData, totalAmount: totalSalary });
+    try {
+      const { commission, totalSalary } = calculateTotalSalary();
+
+      const data = {
+        ...formData,
+        totalAmount: totalSalary, // Deducted total salary
+        amount: commission,       // Deducted commission
+        admin: user._id,
+      };
+
+      const { success, message } = await createSalary(token, data);
+      if (success) {
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: message,
+          timer: 1500,
+        });
+        setTimeout(() => {
+          setSelectedPage("/reports/salaries");
+        }, 2000);
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: message,
+        });
+      }
+    } catch (error) {
+      console.error("Error creating salary:", error);
+    }
+  };
+
+  // Get Current Sales Amount
+  const getCurrentSalesAmount = async (value) => {
+    const { totalMonthlySales } = await getEmployeeCurrentSalesAmount(value, token);
+    setTotalMonthlySales(totalMonthlySales);
   };
 
   return (
@@ -61,25 +139,49 @@ const AddSalaryForm = ({ setSelectedPage }) => {
                 onChange={handleChangeEmployee}
                 label="Employee"
               >
-                {[{_id: "67d7f60e6048f2e2ca739df8", name: "Muhammad Shayan"}, {_id: "67d7f60e6048f2e2ca739df9", name: "Hassan Raza"}, {_id: "67d7f60e6048f2e2ca739dfa", name: "Sagheer Hussain"}].map(
-                  (employee) => (
-                    <MenuItem key={employee._id} value={employee._id}>
-                      {employee.name}
-                    </MenuItem>
-                  )
-                )}
+                {employees?.map((employee) => (
+                  <MenuItem key={employee._id} value={employee._id}>
+                    {employee.name}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
           </Grid>
+
+          {totalMonthlySales !== 0 && (
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label="Total Monthly Sales"
+                type="number"
+                value={totalMonthlySales}
+                disabled
+                sx={{ backgroundColor: "#1e1e1e", borderRadius: 1 }}
+              />
+            </Grid>
+          )}
 
           <Grid item xs={12} md={6}>
             <TextField
               fullWidth
               label="Commission in % e.g. 20%"
-              name="amount"
               type="number"
+              name="amount"
               value={formData.amount}
               onChange={handleChange}
+              required
+              sx={{ backgroundColor: "#1e1e1e", borderRadius: 1 }}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <TextField
+              fullWidth
+              label="Tax Deduction in % e.g. 10%"
+              type="number"
+              name="textDeduction"
+              value={textDeduction}
+              onChange={(e) => setTextDeduction(e.target.value)}
               required
               sx={{ backgroundColor: "#1e1e1e", borderRadius: 1 }}
             />
@@ -91,7 +193,7 @@ const AddSalaryForm = ({ setSelectedPage }) => {
               label="Current Dollar Rate"
               name="dollarRate"
               type="number"
-              value={280}
+              value={rates.PKR || 280}
               disabled
               sx={{ backgroundColor: "#1e1e1e", borderRadius: 1 }}
             />
@@ -115,7 +217,7 @@ const AddSalaryForm = ({ setSelectedPage }) => {
               label="Total Amount in PKR"
               name="totalAmount"
               type="number"
-              value={calculateTotalSalary()}
+              value={calculateTotalSalary().totalSalary}
               disabled
               sx={{ backgroundColor: "#1e1e1e", borderRadius: 1 }}
             />
@@ -146,10 +248,55 @@ const AddSalaryForm = ({ setSelectedPage }) => {
               label="Paid Date"
               name="paidDate"
               type="date"
-              value={formData.date}
+              value={formData.paidDate}
               onChange={handleChange}
               required
               InputLabelProps={{ shrink: true }}
+              sx={{ backgroundColor: "#1e1e1e", borderRadius: 1 }}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <TextField
+              select
+              fullWidth
+              label="Month"
+              name="month"
+              value={formData.month}
+              onChange={handleChange}
+              required
+              sx={{ backgroundColor: "#1e1e1e", borderRadius: 1 }}
+            >
+              {[
+                "January",
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December",
+              ].map((option) => (
+                <MenuItem key={option} value={option}>
+                  {option}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <TextField
+              fullWidth
+              label="Year"
+              name="year"
+              type="number"
+              value={formData.year}
+              onChange={handleChange}
+              required
               sx={{ backgroundColor: "#1e1e1e", borderRadius: 1 }}
             />
           </Grid>
@@ -176,4 +323,3 @@ const AddSalaryForm = ({ setSelectedPage }) => {
 };
 
 export default AddSalaryForm;
-

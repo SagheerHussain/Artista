@@ -1,0 +1,9 @@
+
+3. CRUD Opearation of Payment Methods
+5. Design Login / Register
+
+
+
+
+BUGS
+1. In Edit Salary Current Sales Amount fetch on second time

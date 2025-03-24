@@ -55,7 +55,11 @@ const LoginPage = () => {
         }, 2500);
       }
     } catch (error) {
-      console.error("Error logging in:", error);
+      Swal.fire({
+        icon: "error",
+        text: "Failed to Login",
+        timer: 1500,
+      });
       setLoading(false);
     }
   };

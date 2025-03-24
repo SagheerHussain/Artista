@@ -39,9 +39,9 @@ const EditSalesModal = ({
     year: "",
     leadDate: "",
   });
+  const [recievedAmount, setRecievedAmount] = useState("");
 
   const [paymentTypes, setPaymentTypes] = useState([]);
-  const [previousReceived, setPreviousReceived] = useState(0);
 
   // Fetch Payment Methods
   const fetchPaymentMethods = async () => {
@@ -65,7 +65,7 @@ const EditSalesModal = ({
         summary: sale.summary || "",
         totalAmount: sale.totalAmount || 0,
         upfrontAmount: sale.upfrontAmount || 0,
-        receivedAmount: 0, // Fresh input ke liye empty
+        receivedAmount: sale.receivedAmount || 0,
         remainingAmount: sale.remainingAmount || 0,
         paymentMethod: sale.paymentMethod?._id || "",
         status: sale.status || "",
@@ -77,8 +77,6 @@ const EditSalesModal = ({
         leadDate: sale.leadDate || "",
         user: sale.user || "",
       });
-
-      setPreviousReceived(Number(sale.receivedAmount || 0)); // Save previous received
     } catch (error) {
       console.error("Error fetching sale data:", error);
     }
@@ -99,26 +97,14 @@ const EditSalesModal = ({
     const { name, value } = e.target;
 
     if (name === "receivedAmount") {
-      const newInput = Number(value);
-      const totalReceivedCheck =
-        Number(formData.upfrontAmount) + previousReceived + newInput;
+      setRecievedAmount(Number(value));
 
-      if (totalReceivedCheck > Number(formData.totalAmount)) {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "Received amount cannot exceed total amount",
-        });
-        return;
-      }
-
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: newInput,
-      }));
-      return;
+      // Also update in formData to keep in sync
+      // setFormData((prevData) => ({
+      //   ...prevData,
+      //   receivedAmount: Number(value),
+      // }));
     }
-
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
@@ -128,47 +114,28 @@ const EditSalesModal = ({
   // Cancel Popup
   const handleCancelPopup = () => {
     onClose();
+    setRecievedAmount(0);
   };
-
-  // Calculations
-  const totalRecievedAmount =
-    Number(formData.upfrontAmount) + previousReceived + Number(formData.receivedAmount);
-
-  const remainingAmount = Math.max(
-    Number(formData.totalAmount) - totalRecievedAmount,
-    0
-  );
-
-  useEffect(() => {
-    setFormData((prevData) => ({
-      ...prevData,
-      remainingAmount: remainingAmount,
-    }));
-  }, [formData.receivedAmount, formData.totalAmount, formData.upfrontAmount]);
 
   // Form Submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const finalReceivedAmount = previousReceived + Number(formData.receivedAmount);
-
-    if (Number(formData.upfrontAmount) + finalReceivedAmount > Number(formData.totalAmount)) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Received amount cannot exceed total amount",
-      });
-      return;
-    }
-
-    const updatedForm = {
-      ...formData,
-      receivedAmount: finalReceivedAmount,
-      remainingAmount: Number(formData.totalAmount) - (Number(formData.upfrontAmount) + finalReceivedAmount),
-    };
-
     try {
-      const { success, message } = await updateSale(saleId, updatedForm, token);
+      if (
+        Number(formData.receivedAmount) + Number(formData.upfrontAmount) >
+        Number(formData.totalAmount)
+      ) {
+        onClose();
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Received amount cannot exceed total amount",
+        });
+        setRecievedAmount(0);
+        return;
+      }
+
+      const { success, message } = await updateSale(saleId, formData, token);
       if (success) {
         Swal.fire({
           icon: "success",
@@ -178,6 +145,7 @@ const EditSalesModal = ({
         });
         onClose();
         refetchSales();
+        setRecievedAmount(0);
       } else {
         Swal.fire({
           icon: "error",
@@ -189,6 +157,13 @@ const EditSalesModal = ({
       console.error("Error updating sale:", error);
     }
   };
+
+  // Calcualte Total Amount
+  const totalRecievedAmount =
+    Number(formData.upfrontAmount) +
+    Number(formData.receivedAmount) +
+    recievedAmount;
+  const remainingAmount = Number(formData.totalAmount) - totalRecievedAmount;
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -262,9 +237,9 @@ const EditSalesModal = ({
                 label="Received Amount $"
                 name="receivedAmount"
                 type="number"
-                value={formData.receivedAmount}
+                value={recievedAmount}
                 onChange={handleChange}
-                disabled={remainingAmount === 0 ? true : false}
+                disabled={formData.remainingAmount === 0 ? true : false}
                 InputLabelProps={{ shrink: true }}
                 sx={{ backgroundColor: "#1e1e1e", borderRadius: 1 }}
               />

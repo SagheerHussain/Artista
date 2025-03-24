@@ -28,7 +28,6 @@ export const loginAccount = async (data) => {
       return response.data;
     } catch (error) {
       console.error("Error logging in:", error);
-      alert("Failed to log in");
     }
   };
   
