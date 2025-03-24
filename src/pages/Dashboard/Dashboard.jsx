@@ -39,7 +39,7 @@ import useExchangeRates from "@hooks/UseExchangeRates";
 import Hello from "@components/Charts/Hello";
 import { MonetizationOn } from "@mui/icons-material";
 import MultiBarCharts from "@components/Charts/MultiBarCharts";
-// import PieChart from "@components/Charts/PieChart";  
+// import PieChart from "@components/Charts/PieChart";
 import ProfitLossChart from "@components/Charts/ProfitLossChart";
 import PieChartWithCustomizedLabel from "@components/Charts/PieChartWithCustomizedLabel";
 
@@ -87,7 +87,7 @@ export default function Dashboard() {
 
   // Exchange Rates
   const rates = useExchangeRates();
-  console.log("rates", rates)
+  console.log("rates", rates);
 
   const NAVIGATION = [
     { kind: "header", title: "Main" },
@@ -142,9 +142,18 @@ export default function Dashboard() {
   const fetchAnalytics = async () => {
     try {
       const revenue = await getRevenue(token);
-      const recievedAmount = user?.role === "admin" ? await getTotalRecievedAmount(token) : await getRecievedAmountByEmployee(user._id, token);
-      const pendingAmount = user?.role === "admin" ? await getPendingAmount(token) : await getPendingAmountByEmployee(user._id, token);
-      const clients = user?.role === "admin" ? await getClients(token) : await getClientsByEmployee(user._id, token); 
+      const recievedAmount =
+        user?.role === "admin"
+          ? await getTotalRecievedAmount(token)
+          : await getRecievedAmountByEmployee(user._id, token);
+      const pendingAmount =
+        user?.role === "admin"
+          ? await getPendingAmount(token)
+          : await getPendingAmountByEmployee(user._id, token);
+      const clients =
+        user?.role === "admin"
+          ? await getClients(token)
+          : await getClientsByEmployee(user._id, token);
       // const expance = await getTotalExpance(token);
       setTotalRevenue(revenue.totalAmount);
       setTotalRecievedAmount(recievedAmount.totalReceivedAmount);
@@ -211,7 +220,9 @@ export default function Dashboard() {
                       display="flex"
                       justifyContent="space-between"
                     >
-                      <DashboardCard sx={{ width: "100%", marginRight: "1.5rem" }}>
+                      <DashboardCard
+                        sx={{ width: "100%", marginRight: "1.5rem" }}
+                      >
                         <IconButton color="secondary">
                           {/* https://nucleoapp.com/svg-flag-icons */}
                           <svg
@@ -255,14 +266,14 @@ export default function Dashboard() {
                         <CardContent>
                           <Typography variant="h6">USD to PKR</Typography>
                           <Typography variant="h5">
-                            {rates.PKR
-                              ? ` ${rates.PKR}`
-                              : "Loading..."}
+                            {rates.PKR ? ` ${rates.PKR}` : "Loading..."}
                           </Typography>
                         </CardContent>
                       </DashboardCard>
 
-                      <DashboardCard sx={{ width: "100%", marginRight: "1.5rem" }}>
+                      <DashboardCard
+                        sx={{ width: "100%", marginRight: "1.5rem" }}
+                      >
                         <IconButton color="secondary">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -341,14 +352,14 @@ export default function Dashboard() {
                         <CardContent>
                           <Typography variant="h6">EUR to PKR</Typography>
                           <Typography variant="h5">
-                            {rates.EUR
-                              ? ` ${rates.EUR}`
-                              : "Loading..."}
+                            {rates.EUR ? ` ${rates.EUR}` : "Loading..."}
                           </Typography>
                         </CardContent>
                       </DashboardCard>
 
-                      <DashboardCard sx={{ width: "100%", marginRight: "1.5rem" }}>
+                      <DashboardCard
+                        sx={{ width: "100%", marginRight: "1.5rem" }}
+                      >
                         <IconButton color="secondary">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -432,9 +443,7 @@ export default function Dashboard() {
                         <CardContent>
                           <Typography variant="h6">GBP to PKR</Typography>
                           <Typography variant="h5">
-                            {rates.GBP
-                              ? `${rates.GBP}`
-                              : "Loading..."}
+                            {rates.GBP ? `${rates.GBP}` : "Loading..."}
                           </Typography>
                         </CardContent>
                       </DashboardCard>
@@ -471,9 +480,7 @@ export default function Dashboard() {
                         <CardContent>
                           <Typography variant="h6">AED to PKR</Typography>
                           <Typography variant="h5">
-                            {rates.AED
-                              ? ` ${rates.AED}`
-                              : "Loading..."}
+                            {rates.AED ? ` ${rates.AED}` : "Loading..."}
                           </Typography>
                         </CardContent>
                       </DashboardCard>
@@ -498,7 +505,12 @@ export default function Dashboard() {
                       </Grid>
                     )}
 
-                    <Grid item xs={12} sm={6} lg={user?.role === "admin" ? 3 : 4}>
+                    <Grid
+                      item
+                      xs={12}
+                      sm={6}
+                      lg={user?.role === "admin" ? 3 : 4}
+                    >
                       <DashboardCard>
                         <IconButton color="primary">
                           <MonetizationOn fontSize="large" />
@@ -510,7 +522,12 @@ export default function Dashboard() {
                       </DashboardCard>
                     </Grid>
 
-                    <Grid item xs={12} sm={6} lg={user?.role === "admin" ? 3 : 4}>
+                    <Grid
+                      item
+                      xs={12}
+                      sm={6}
+                      lg={user?.role === "admin" ? 3 : 4}
+                    >
                       <DashboardCard>
                         <IconButton color="secondary">
                           <MonetizationOn fontSize="large" />
@@ -526,7 +543,12 @@ export default function Dashboard() {
                       </DashboardCard>
                     </Grid>
 
-                    <Grid item xs={12} sm={6} lg={user?.role === "admin" ? 3 : 4}>
+                    <Grid
+                      item
+                      xs={12}
+                      sm={6}
+                      lg={user?.role === "admin" ? 3 : 4}
+                    >
                       <DashboardCard>
                         <IconButton color="secondary">
                           <PeopleAltIcon fontSize="large" />
@@ -539,29 +561,27 @@ export default function Dashboard() {
                     </Grid>
                   </Grid>
                   {/* Charts */}
-                  <div className="w-full p-4">
-                    <Typography variant="h5" className="block font-bold">
-                      Analytics Overview
-                    </Typography>
-                    <div className="flex flex-wrap">
-                      <div className="flex-[0_0_100%] px-2">
-                        {/* Multiple chart */}
-                        <MultiBarCharts totalRevenue={totalRevenue}  />
-                        
+                  {user?.role === "admin" && (
+                    <div className="w-full p-4">
+                      <Typography variant="h5" className="block font-bold">
+                        Analytics Overview
+                      </Typography>
+                      <div className="flex flex-wrap">
+                        <div className="flex-[0_0_100%] px-2">
+                          {/* Multiple chart */}
+                          <MultiBarCharts totalRevenue={totalRevenue} />
+                        </div>
                       </div>
-                      
-                    </div>
-                    <div className="flex flex-wrap mt-4">
-                      <div className="flex-[0_0_100%] px-2">
-                        {/* Profit & Loss */}
-                        <ProfitLossChart totalRevenue={totalRevenue}  />
+                      <div className="flex flex-wrap mt-4">
+                        <div className="flex-[0_0_100%] px-2">
+                          {/* Profit & Loss */}
+                          <ProfitLossChart totalRevenue={totalRevenue} />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                
+                  )}
                 </>
               )}
-
             </Box>
           </PageContainer>
         </DashboardLayout>
