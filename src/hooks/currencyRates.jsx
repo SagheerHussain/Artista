@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-const UseExchangeRates = () => {
+const currencyRates = () => {
   const [exchangeRates, setExchangeRates] = useState({
     PKR: 0,
     EUR: 0,
@@ -12,10 +12,8 @@ const UseExchangeRates = () => {
   useEffect(() => {
     const fetchDollarRate = async () => {
       try {
-        const response = await fetch(
-          ""
-        );
-        // "https://v6.exchangerate-api.com/v6/9f8daea350a3e0335db1697e/latest/PKR"
+        const response = await fetch("https://v6.exchangerate-api.com/v6/9f8daea350a3e0335db1697e/latest/PKR");
+        
 
         const data = await response.json();
 
@@ -49,4 +47,4 @@ const UseExchangeRates = () => {
   return exchangeRates;
 };
 
-export default UseExchangeRates;
+export default currencyRates;

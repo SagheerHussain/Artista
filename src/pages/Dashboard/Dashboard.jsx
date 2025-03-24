@@ -35,8 +35,7 @@ import {
   getPendingAmountByEmployee,
   getClientsByEmployee,
 } from "../../../services/analyticsService";
-import useExchangeRates from "@hooks/UseExchangeRates";
-import Hello from "@components/Charts/Hello";
+import currencyRates from "../../hooks/currencyRates"
 import { MonetizationOn } from "@mui/icons-material";
 import MultiBarCharts from "@components/Charts/MultiBarCharts";
 // import PieChart from "@components/Charts/PieChart";
@@ -86,7 +85,7 @@ export default function Dashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
 
   // Exchange Rates
-  const rates = useExchangeRates();
+  const rates = currencyRates();
   console.log("rates", rates);
 
   const NAVIGATION = [

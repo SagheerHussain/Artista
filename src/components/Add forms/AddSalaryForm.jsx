@@ -13,7 +13,7 @@ import { getEmployees } from "../../../services/users";
 import { createSalary } from "../../../services/salary";
 import Swal from "sweetalert2";
 import { getEmployeeCurrentSalesAmount } from "../../../services/sales";
-import UseExchangeRates from "../../hooks/UseExchangeRates";
+import currencyRates from "../../hooks/currencyRates";
 
 const AddSalaryForm = ({ setSelectedPage }) => {
   const token = JSON.parse(localStorage.getItem("token"));
@@ -30,7 +30,7 @@ const AddSalaryForm = ({ setSelectedPage }) => {
   });
 
   // Exchange Rates
-  const rates = UseExchangeRates();
+  const rates = currencyRates();
 
   const [employees, setEmployees] = useState([]);
   const [totalMonthlySales, setTotalMonthlySales] = useState(0);
