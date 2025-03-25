@@ -4,3 +4,11 @@ div[aria-label="Light mode"] {
 header .MuiTypography-root.MuiTypography-h6 {
     display: none !important;
 }
+
+/* Min Height Of Table Row */
+.MuiDataGrid-virtualScroller.MuiDataGrid-virtualScroller--hasScrollX {
+    min-height: 250px !important;
+}
+.MuiDataGrid-row {
+    background: #222 !important;
+}

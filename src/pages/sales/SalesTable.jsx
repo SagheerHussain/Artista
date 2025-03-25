@@ -213,7 +213,7 @@ const SalesTable = ({ setSelectedPage }) => {
       field: "projectTitle",
       headerName: "Project Title",
       flex: 1,
-      minWidth: 350,
+      minWidth: 200,
     },
     { field: "summary", headerName: "Summary", flex: 1, minWidth: 250 },
     {
@@ -246,7 +246,7 @@ const SalesTable = ({ setSelectedPage }) => {
       flex: 1,
       minWidth: 150,
       renderCell: (params) => (
-        <span className="px-4 py-2 font-semibold rounded-[25px] text-[#b08afb] bg-[#100d2a91]">
+        <span className="px-4 py-2 font-semibold rounded-[25px] text-[#eea124] bg-[#44341d]">
           {params.row.paymentMethod}
         </span>
       ),
@@ -260,10 +260,10 @@ const SalesTable = ({ setSelectedPage }) => {
         <span
           className={`px-4 py-2 font-semibold rounded-[25px] ${
             params.row.status === "Fully Paid"
-              ? "text-[#24a24f] bg-[#0d2a1f]"
+              ? "text-[#58e186] bg-[#0d2a1f]"
               : params.row.status === "Partially Paid"
-                ? "text-[#79a7bc] bg-[#152432]"
-                : "text-[#f43333] bg-[#3e1716]"
+                ? "text-[#ff6dae] bg-[#32152eb6]"
+                : "text-[#ec3e7b] bg-[#441729]"
           }`}
         >
           {params.row.status}
@@ -283,12 +283,12 @@ const SalesTable = ({ setSelectedPage }) => {
         renderCell: (params) => (
           <>
             <IconButton onClick={() => handleEditSale(params.row.id)}>
-              <FaPencilAlt size={20} className="text-white" />
+              <FaPencilAlt size={16} className="text-[#71717a]" />
             </IconButton>
 
             {user?.role === "employee" && (
               <IconButton onClick={() => handleDelete(params.row.id)}>
-                <MdDelete size={22} className="text-white" />
+                <MdDelete size={18} className="text-[#bc134f]" />
               </IconButton>
             )}
           </>

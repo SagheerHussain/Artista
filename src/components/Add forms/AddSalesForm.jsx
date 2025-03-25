@@ -25,6 +25,7 @@ const AddSalesForm = ({ setSelectedPage }) => {
     totalAmount: "",
     paymentMethod: "",
     status: "",
+    user: user?._id || "",
   });
   const [paymentTypes, setPaymentTypes] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -58,10 +59,25 @@ const AddSalesForm = ({ setSelectedPage }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setFormData({
-      ...formData,
-      user: user._id
-    });
+
+    if (
+      !formData.clientName ||
+      !formData.projectTitle ||
+      !formData.summary ||
+      !formData.upfrontAmount ||
+      !formData.totalAmount ||
+      !formData.paymentMethod ||
+      !formData.status
+    ) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "All fields are required",
+      });
+      setLoading(false);
+      return;
+    }
+
     try {
       const { message, success } = await createSale(formData, token);
       if (success) {
@@ -201,7 +217,12 @@ const AddSalesForm = ({ setSelectedPage }) => {
           >
             Cancel
           </Button>
-          <Button variant="contained" color="primary" type="submit" disabled={loading}>
+          <Button
+            variant="contained"
+            color="primary"
+            type="submit"
+            disabled={loading}
+          >
             {loading ? <ClipLoader size={28} color="#fff" /> : "Create"}
           </Button>
         </Box>

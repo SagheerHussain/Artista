@@ -35,12 +35,15 @@ import {
   getPendingAmountByEmployee,
   getClientsByEmployee,
 } from "../../../services/analyticsService";
-import currencyRates from "../../hooks/currencyRates"
+import currencyRates from "../../hooks/currencyRates";
 import { MonetizationOn } from "@mui/icons-material";
 import MultiBarCharts from "@components/Charts/MultiBarCharts";
 // import PieChart from "@components/Charts/PieChart";
 import ProfitLossChart from "@components/Charts/ProfitLossChart";
-import PieChartWithCustomizedLabel from "@components/Charts/PieChartWithCustomizedLabel";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+// import PieChartWithCustomizedLabel from "@components/Charts/PieChartWithCustomizedLabel";
+// import { ProfileMenu } from "../../components";
 
 const darkTheme = createTheme({
   palette: {
@@ -84,6 +87,45 @@ const DashboardCard = styled(Card)(({ theme = "dark" }) => ({
 export default function Dashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
 
+  const [session, setSession] = React.useState({
+    user: {
+      name: user.name || "User",
+      email: user.email || "user@example.com",
+      image: user.profilePicture || "https://cdn-icons-png.flaticon.com/512/149/149071.png",
+    },
+  });
+
+  // Navigate
+  const navigate = useNavigate();
+
+  // Profile Menu
+  const authentication = React.useMemo(() => {
+    return {
+      signIn: () => {
+        setSession({
+          user: {
+            name: user.name,
+            email: user.email,
+            image: user.image,
+          },
+        });
+      },
+      signOut: () => {
+        setSession(null);
+        Swal.fire({
+          title: "Logout",
+          text: "You have been logged out.",
+          icon: "success",
+          confirmButtonText: "OK",
+          timer: 1000,
+        }).then(() => {
+          localStorage.clear();
+          navigate("/");
+        });
+      },
+    };
+  }, []);
+
   // Exchange Rates
   const rates = currencyRates();
   console.log("rates", rates);
@@ -121,10 +163,10 @@ export default function Dashboard() {
   const token = JSON.parse(localStorage.getItem("token"));
 
   // State Variabels
-  const [totalRevenue, setTotalRevenue] = useState(1);
-  const [totalRecievedAmount, setTotalRecievedAmount] = useState(1);
-  const [pendingAmount, setPendingAmount] = useState(1);
-  const [clients, setClients] = useState(1);
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  const [totalRecievedAmount, setTotalRecievedAmount] = useState(0);
+  const [pendingAmount, setPendingAmount] = useState(0);
+  const [clients, setClients] = useState(0);
 
   const router = useDemoRouter("/dashboard");
   const [selectedPage, setSelectedPage] = React.useState("dashboard");
@@ -178,6 +220,8 @@ export default function Dashboard() {
           homeUrl: "/",
         }}
         navigation={NAVIGATION}
+        session={session}
+        authentication={authentication}
         router={{
           ...router,
           navigate: (path) => {

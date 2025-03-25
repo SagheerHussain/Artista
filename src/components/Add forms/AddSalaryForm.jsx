@@ -98,6 +98,7 @@ const AddSalaryForm = ({ setSelectedPage }) => {
         admin: user._id,
       };
 
+
       const { success, message } = await createSalary(token, data);
       if (success) {
         Swal.fire({
