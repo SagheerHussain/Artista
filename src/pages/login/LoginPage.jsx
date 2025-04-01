@@ -28,8 +28,17 @@ const LoginPage = () => {
     e.preventDefault();
     setLoading(true);
     try {
+      if (formData.email === "" || formData.password === "") {
+        Swal.fire({
+          icon: "error",
+          text: "All Fields are required",
+          timer: 1500,
+        });
+        setLoading(false);
+        return;
+      }
       const user = await loginAccount(formData);
-      console.log("user", user)
+      console.log("user", user);
       if (user.success === true) {
         setLoading(false);
         Swal.fire({
@@ -126,7 +135,10 @@ const LoginPage = () => {
             </p> */}
 
             <div className="mt-4">
-              <Link to={`/`} className="text-zinc-300 hover:text-zinc-400 underline">
+              <Link
+                to={`/`}
+                className="text-zinc-300 hover:text-zinc-400 underline"
+              >
                 Forget Password?
               </Link>
             </div>
