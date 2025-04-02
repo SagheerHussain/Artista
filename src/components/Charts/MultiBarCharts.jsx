@@ -124,7 +124,7 @@ const MultiBarChart = () => {
   };
 
   return (
-    <div className="w-full rounded-xl shadow-lg p-4">
+    <div className="w-full rounded-xl shadow-lg">
       <div className="flex justify-between items-center mb-4">
         <Listbox value={selectedOption} onChange={setSelectedOption}>
           <div className="relative">

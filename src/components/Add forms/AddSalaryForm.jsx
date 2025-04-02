@@ -23,7 +23,6 @@ const AddSalaryForm = ({ setSelectedPage }) => {
     employee: "",
     amount: 0, // Commission %
     bonus: 0,
-    month: "",
     year: 2025,
     status: "",
     paidDate: "",
@@ -149,7 +148,7 @@ const AddSalaryForm = ({ setSelectedPage }) => {
             </FormControl>
           </Grid>
 
-          {totalMonthlySales !== 0 && (
+          {totalMonthlySales >= 0 && (
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
@@ -255,38 +254,6 @@ const AddSalaryForm = ({ setSelectedPage }) => {
               InputLabelProps={{ shrink: true }}
               sx={{ backgroundColor: "#1e1e1e", borderRadius: 1 }}
             />
-          </Grid>
-
-          <Grid item xs={12} md={6}>
-            <TextField
-              select
-              fullWidth
-              label="Month"
-              name="month"
-              value={formData.month}
-              onChange={handleChange}
-              required
-              sx={{ backgroundColor: "#1e1e1e", borderRadius: 1 }}
-            >
-              {[
-                "January",
-                "February",
-                "March",
-                "April",
-                "May",
-                "June",
-                "July",
-                "August",
-                "September",
-                "October",
-                "November",
-                "December",
-              ].map((option) => (
-                <MenuItem key={option} value={option}>
-                  {option}
-                </MenuItem>
-              ))}
-            </TextField>
           </Grid>
 
           <Grid item xs={12} md={6}>

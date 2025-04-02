@@ -38,8 +38,6 @@ const SalesTable = ({ setSelectedPage }) => {
   const [selectedSale, setSelectedSale] = useState(null);
   const [rows, setRows] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [selectedId, setSelectedId] = useState(null);
   const [sales, setSales] = useState([]);
   const [employees, setEmployees] = useState([]);
 
@@ -273,28 +271,27 @@ const SalesTable = ({ setSelectedPage }) => {
     { field: "month", headerName: "Month", flex: 1, minWidth: 150 },
     { field: "year", headerName: "Year", flex: 1, minWidth: 150 },
     { field: "leadDate", headerName: "Lead Date", flex: 1, minWidth: 150 },
-  
-      {
-        field: "actions",
-        headerName: "Actions",
-        flex: 1,
-        minWidth: 150,
-        sortable: false,
-        renderCell: (params) => (
-          <>
-            <IconButton onClick={() => handleEditSale(params.row.id)}>
-              <FaPencilAlt size={16} className="text-[#71717a]" />
+
+    {
+      field: "actions",
+      headerName: "Actions",
+      flex: 1,
+      minWidth: 150,
+      sortable: false,
+      renderCell: (params) => (
+        <>
+          <IconButton onClick={() => handleEditSale(params.row.id)}>
+            <FaPencilAlt size={16} className="text-[#71717a]" />
+          </IconButton>
+
+          {user?.role === "employee" && (
+            <IconButton onClick={() => handleDelete(params.row.id)}>
+              <MdDelete size={18} className="text-[#bc134f]" />
             </IconButton>
-
-            {user?.role === "employee" && (
-              <IconButton onClick={() => handleDelete(params.row.id)}>
-                <MdDelete size={18} className="text-[#bc134f]" />
-              </IconButton>
-            )}
-          </>
-        ),
-      },
-
+          )}
+        </>
+      ),
+    },
   ];
 
   return (
@@ -316,87 +313,99 @@ const SalesTable = ({ setSelectedPage }) => {
       )}
 
       {/* Filters */}
-      <div className="search_records flex justify-between gap-4 mb-4">
+      <div className="search_records sm:flex justify-between gap-4 mb-4">
         {user?.role === "admin" && (
-          <FormControl className="w-1/2">
-            <InputLabel>Employee</InputLabel>
+          <div className="mb-4 w-full sm:w-1/2">
+            <FormControl fullWidth>
+              <InputLabel>Employee</InputLabel>
+              <Select
+                value={filters.employeeId}
+                label="Employee"
+                onChange={(e) =>
+                  handleFilterChange("employeeId", e.target.value)
+                }
+              >
+                {employees?.map((employee) => (
+                  <MenuItem key={employee._id} value={employee._id}>
+                    {employee.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </div>
+        )}
+        <div className="mb-4 w-full sm:w-1/2">
+          <FormControl fullWidth>
+            <InputLabel>Status</InputLabel>
             <Select
-              value={filters.employeeId}
-              label="Employee"
-              onChange={(e) => handleFilterChange("employeeId", e.target.value)}
+              value={filters.status}
+              label="Status"
+              onChange={(e) => handleFilterChange("status", e.target.value)}
             >
-              {employees?.map((employee) => (
-                <MenuItem key={employee._id} value={employee._id}>
-                  {employee.name}
+              {["Pending", "Fully Paid", "Partially Paid"].map((status) => (
+                <MenuItem key={status} value={status}>
+                  {status}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
-        )}
-        <FormControl className="w-1/2">
-          <InputLabel>Status</InputLabel>
-          <Select
-            value={filters.status}
-            label="Status"
-            onChange={(e) => handleFilterChange("status", e.target.value)}
-          >
-            {["Pending", "Fully Paid", "Partially Paid"].map((status) => (
-              <MenuItem key={status} value={status}>
-                {status}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <TextField
-          label="Search Records"
-          variant="outlined"
-          className="w-1/2"
-          onChange={(e) => handleFilterChange("search", e.target.value)}
-        />
+        </div>
+        <div className="mb-4 w-full sm:w-1/2">
+          <TextField
+            label="Search Records"
+            variant="outlined"
+            fullWidth
+            onChange={(e) => handleFilterChange("search", e.target.value)}
+          />
+        </div>
       </div>
 
-      <div className="filter_records flex gap-4">
-        <FormControl fullWidth>
-          <InputLabel>Month</InputLabel>
-          <Select
-            value={filters.month}
-            label="Month"
-            onChange={(e) => handleFilterChange("month", e.target.value)}
-          >
-            {[
-              "January",
-              "February",
-              "March",
-              "April",
-              "May",
-              "June",
-              "July",
-              "August",
-              "September",
-              "October",
-              "November",
-              "December",
-            ].map((month) => (
-              <MenuItem key={month} value={month}>
-                {month}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl fullWidth>
-          <InputLabel>Year</InputLabel>
-          <Select
-            value={filters.year}
-            label="Year"
-            onChange={(e) => handleFilterChange("year", e.target.value)}
-          >
-            {[2025, 2024, 2023, 2022, 2021, 2020].map((year) => (
-              <MenuItem key={year} value={year}>
-                {year}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+      <div className="filter_records sm:flex gap-4">
+        <div className="mb-4 w-full sm:w-1/2">
+          <FormControl fullWidth>
+            <InputLabel>Month</InputLabel>
+            <Select
+              value={filters.month}
+              label="Month"
+              onChange={(e) => handleFilterChange("month", e.target.value)}
+            >
+              {[
+                "January",
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December",
+              ].map((month) => (
+                <MenuItem key={month} value={month}>
+                  {month}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </div>
+        <div className="mb-4 w-full sm:w-1/2">
+          <FormControl fullWidth>
+            <InputLabel>Year</InputLabel>
+            <Select
+              value={filters.year}
+              label="Year"
+              onChange={(e) => handleFilterChange("year", e.target.value)}
+            >
+              {[2025, 2024, 2023, 2022, 2021, 2020].map((year) => (
+                <MenuItem key={year} value={year}>
+                  {year}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </div>
       </div>
 
       {/* Sales Table */}
@@ -425,3 +434,5 @@ const SalesTable = ({ setSelectedPage }) => {
 };
 
 export default SalesTable;
+
+// Expense

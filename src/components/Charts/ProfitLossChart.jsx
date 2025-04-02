@@ -99,7 +99,7 @@ const ProfitLossChart = () => {
   };
 
   return (
-    <div className="w-full rounded-xl shadow-lg p-4">
+    <div className="w-full rounded-xl shadow-lg">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-bold">Profit & Loss Overview</h2>
 

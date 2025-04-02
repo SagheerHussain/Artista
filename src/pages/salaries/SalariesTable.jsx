@@ -241,7 +241,7 @@ const SalariesTable = ({ setSelectedPage }) => {
         </Button>
       </Box>
 
-      <div className="search_records grid grid-cols-4 gap-4">
+      <div className="search_records grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <FormControl className="w-full">
           <InputLabel id="demo-simple-select-label">Employee</InputLabel>
           <Select

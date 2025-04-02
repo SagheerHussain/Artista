@@ -223,7 +223,7 @@ const AddSalesForm = ({ setSelectedPage }) => {
             type="submit"
             disabled={loading}
           >
-            {loading ? <ClipLoader size={28} color="#fff" /> : "Create"}
+            {loading ? <ClipLoader size={28} color="#fff" /> : "Add Sale"}
           </Button>
         </Box>
       </form>
