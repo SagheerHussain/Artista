@@ -10,11 +10,6 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<LoginPage />} />
-<<<<<<< HEAD
-        {/* <Route path="/register" element={<RegisterPage />} /> */}
-=======
-        <Route path="/register" element={<RegisterPage />} />
->>>>>>> 1423738 (Frontend)
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<DashboardPage />} />
         </Route>
