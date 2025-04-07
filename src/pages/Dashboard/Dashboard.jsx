@@ -19,7 +19,10 @@ import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import { AppProvider } from "@toolpad/core/AppProvider";
 import { DashboardLayout } from "@toolpad/core/DashboardLayout";
 import { PageContainer } from "@toolpad/core/PageContainer";
+<<<<<<< HEAD
 import AddUserForm from "@components/Add forms/AddUserForm";
+=======
+>>>>>>> 1423738 (Frontend)
 import AddSalesForm from "@components/Add forms/AddSalesForm";
 import ExpenseForm from "@components/Add forms/ExpenseForm";
 import UsersTable from "../../pages/users/UsersTable";
@@ -48,6 +51,10 @@ import ExpenseCategoryTable from "../../pages/expense category/ExpenseCategoryTa
 import ExpenseCategoryForm from "../../components/Add forms/ExpenseCategoryForm";
 import PaymentMethodTable from "../payment methods/paymentMethodTable";
 import AddPaymentMethodForm from "../../components/Add forms/AddPaymentMethodForm";
+<<<<<<< HEAD
+=======
+import AddUser from "../../components/Add forms/AddUser";
+>>>>>>> 1423738 (Frontend)
 // import PieChartWithCustomizedLabel from "@components/Charts/PieChartWithCustomizedLabel";
 // import { ProfileMenu } from "../../components";
 
@@ -142,7 +149,11 @@ export default function Dashboard() {
     { kind: "header", title: "Main" },
     { segment: "dashboard", title: "Dashboard", icon: <DashboardIcon /> },
 
+<<<<<<< HEAD
     // { segment: "users", title: "Users", icon: <PeopleAltIcon /> },
+=======
+    { segment: "users", title: "Users", icon: <PeopleAltIcon /> },
+>>>>>>> 1423738 (Frontend)
 
     { kind: "divider" },
     { kind: "header", title: "Analytics" },
@@ -178,7 +189,10 @@ export default function Dashboard() {
           : []),
       ],
     },
+<<<<<<< HEAD
     // { segment: "integrations", title: "Integrations", icon: <LayersIcon /> },
+=======
+>>>>>>> 1423738 (Frontend)
   ];
 
   // Get Token From Storage
@@ -267,7 +281,11 @@ export default function Dashboard() {
               ) : selectedPage === "/reports/paymentMethods" ? (
                 <PaymentMethodTable setSelectedPage={setSelectedPage} />
               ) : selectedPage === "/addUser" ? (
+<<<<<<< HEAD
                 <AddUserForm setSelectedPage={setSelectedPage} />
+=======
+                <AddUser setSelectedPage={setSelectedPage} />
+>>>>>>> 1423738 (Frontend)
               ) : selectedPage === "/addSales" ? (
                 <AddSalesForm setSelectedPage={setSelectedPage} />
               ) : selectedPage === "/addExpense" ? (

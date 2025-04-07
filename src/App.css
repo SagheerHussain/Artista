@@ -6,7 +6,12 @@ header .MuiTypography-root.MuiTypography-h6 {
 }
 
 /* Min Height Of Table Row */
+<<<<<<< HEAD
 .MuiDataGrid-virtualScroller.MuiDataGrid-virtualScroller--hasScrollX {
+=======
+.MuiDataGrid-virtualScroller.MuiDataGrid-virtualScroller--hasScrollX,
+.MuiDataGrid-virtualScrollerContent {
+>>>>>>> 1423738 (Frontend)
   min-height: 250px !important;
 }
 .MuiDataGrid-row {
